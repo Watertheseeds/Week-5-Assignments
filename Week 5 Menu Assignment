@@ -1,0 +1,145 @@
+class Pokemon {
+    constructor(name, level) {
+      this.name = name;
+      this.level = level;
+    }
+  
+    describe() {
+      return `${this.name}, level ${this.level} is in your party.`;
+    }
+  }
+  
+  class CurrentTeam {
+    constructor(name) {
+      this.name = name;
+      this.pokemon = [];
+    }
+  
+    addPokemon(pokemon) {
+      if (pokemon instanceof Pokemon) {
+        this.pokemon.push(pokemon);
+      } else {
+        throw new Error(`Only add a Pokemon. ${pokemon} is not a valid Pokemon.`);
+      }
+    }
+  
+    describe() {
+      return `${this.name} can only be added if there are less than 6 Pokemon.`;
+    }
+  }
+  
+  class TeamMenu {
+    constructor() {
+      this.team = [];
+      this.current = null;
+    }
+  
+    start() {
+      let partyMenu = this.partyMenuScreen();
+  
+      while (partyMenu !== '0') {
+        switch (partyMenu) {
+          case '1':
+            this.chooseYourPokemon();
+            break;
+          case '2':
+            this.viewPokemon();
+            break;
+          case '3':
+            this.deleteParty();
+            break;
+          case '4':
+            this.showAllPokemon();
+            break;
+          default:
+            break;
+        }
+  
+        partyMenu = this.partyMenuScreen();
+      }
+  
+      alert('Back to the battle!');
+    }
+  
+    partyMenuScreen() {
+      return prompt(`
+        0) Exit
+        1) Make your Team
+        2) View Pokemon Party
+        3) Delete Party Composition
+        4) Show Party
+      `);
+    }
+  
+    pokemonSummaryScreen(description) {
+      return prompt(`
+        0) Return
+        1) Create Pokemon
+        2) Release Pokemon
+        --------------------------
+        ${description}
+      `);
+    }
+  
+    showAllPokemon() {
+      let partyString = '';
+      for (let i = 0; i < this.team.length; i++) {
+        partyString += `${i}) ${this.team[i].name}\n`;
+      }
+      alert(partyString);
+    }
+  
+    chooseYourPokemon() {
+      let name = prompt('Choose a name for this team composition:');
+      this.current = new CurrentTeam(name);
+      this.team.push(this.current);
+    }
+  
+    viewPokemon() {
+      let index = prompt('Select the Pokemon Team composition you would like to view:');
+      if (index > -1 && index < this.team.length) {
+        this.current = this.team[index];
+        let description = `Pokemon: ${this.current.name}\n`;
+  
+        for (let x = 0; x < this.current.pokemon.length; x++) {
+          description += `${x}) ${this.current.pokemon[x].name} - ${this.current.pokemon[x].level}\n`;
+        }
+  
+        let choose = this.pokemonSummaryScreen(description);
+        switch (choose) {
+          case '1':
+            this.genPokemon();
+            break;
+          case '2':
+            this.releasePokemon();
+            break;
+          default:
+            break;
+        }
+      }
+    }
+  
+    deleteParty() {
+      let index = prompt('Enter the index of the party you wish to delete:');  
+      if (index > -1 && index < this.team.length) {
+        this.team.splice(index, 1);
+      }
+    }
+  
+    genPokemon() {
+      let name = prompt('Give your Pokemon a name:');
+      let level = prompt('What level is your Pokemon?');
+      this.current.addPokemon(new Pokemon(name, level));
+    }
+  
+    releasePokemon() {
+      let index = prompt('Enter the index of the Pokemon you wish to release:');
+      if (index > -1 && index < this.current.pokemon.length) {
+        this.current.pokemon.splice(index, 1);
+      }
+    }
+  }
+  
+  let homeScreen = new TeamMenu();
+  homeScreen.start();
+  
